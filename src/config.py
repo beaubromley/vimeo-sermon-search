@@ -2,9 +2,9 @@
 
 # Vimeo API credentials
 VIMEO_CREDENTIALS = {
-    'ACCESS_TOKEN': '9d8276ed72b3a9fbc5cbfefdbaab2095',
-    'CLIENT_ID': 'f58d3b47076fb4115d9ec6d59f014c4f2f243ccb',
-    'CLIENT_SECRET': 'dr/Y4aXu83Paj6k95bt9fGSDp7+VlkZjb95Hdi3sRLLPQ0Xr8ZBxl3GpKSohkUHmZy//Wqv/RVdKoxulCXEYblKj9tf2s+RojG6Yx4tdfmgNSSFrqxY19npA27HKnnpp'
+    'ACCESS_TOKEN': '###',
+    'CLIENT_ID': '###',
+    'CLIENT_SECRET': '###'
 }
 
 # File paths
