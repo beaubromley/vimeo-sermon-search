@@ -1,6 +1,11 @@
-# Vimeo API credentials
+# Keep local only - not needed for Streamlit
 src/config.py
-how to use.txt
+src/video_scraper.py
+src/utils.py
+scripts/
+update_and_run.py
+test_vimeo.py
+requirements.txt
 
 # Python cache
 __pycache__/
@@ -11,3 +16,7 @@ scripts/__pycache__/
 
 # OS files
 .DS_Store
+
+# VTT transcript files (too large, only need database)
+data/transcripts/*.vtt
+data/transcripts/video_data.json

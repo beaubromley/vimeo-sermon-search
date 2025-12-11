@@ -1,4 +1,0 @@
-PyVimeo==1.1.2
-webvtt-py==0.4.6
-streamlit==1.29.0
-pandas
