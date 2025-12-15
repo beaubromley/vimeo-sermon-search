@@ -5,7 +5,6 @@ src/utils.py
 scripts/
 update_and_run.py
 test_vimeo.py
-requirements.txt
 push_database.bat
 
 # Python cache - don't upload these
