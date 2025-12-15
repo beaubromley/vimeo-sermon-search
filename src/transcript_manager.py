@@ -1,7 +1,14 @@
 import sqlite3
 import webvtt # Make sure this import is present
 from pathlib import Path
-from .config import DATABASE_PATH # Assuming config.py is in the same directory or src is in PYTHONPATH
+from pathlib import Path
+
+# Define DATABASE_PATH directly since config.py is not in repo
+BASE_DIR = Path(__file__).parent.parent
+DATA_DIR = BASE_DIR / 'data'
+DATABASE_DIR = DATA_DIR / 'database'
+DATABASE_PATH = DATABASE_DIR / 'transcripts.db'
+
 
 class TranscriptManager:
     def __init__(self):
