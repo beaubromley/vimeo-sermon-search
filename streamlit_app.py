@@ -7,7 +7,14 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
 from src.transcript_manager import TranscriptManager
-from src.config import TRANSCRIPT_DIR, DATABASE_PATH
+from pathlib import Path
+
+# Define paths directly since config.py is not in repo
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / 'data'
+TRANSCRIPT_DIR = DATA_DIR / 'transcripts'
+DATABASE_DIR = DATA_DIR / 'database'
+DATABASE_PATH = DATABASE_DIR / 'transcripts.db'
 import json
 import sqlite3
 from datetime import datetime, timedelta
