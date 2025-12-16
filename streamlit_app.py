@@ -260,13 +260,43 @@ def results_to_dataframe(results, result_type='all'):
     if not results:
         return None
     
+    # Load video data to get descriptions/speakers
+    video_data_path = TRANSCRIPT_DIR / 'video_data.json'
+    speaker_map = {}
+    if video_data_path.exists():
+        with open(video_data_path, 'r', encoding='utf-8') as f:
+            videos = json.load(f)
+        
+        # Extract speaker names from descriptions
+        for video in videos:
+            speaker = "Unknown"
+            desc = video.get('description', '')
+            if desc and 'Presented by' in desc:
+                # Extract name between "Presented by" and "on"
+                try:
+                    start = desc.index('Presented by') + len('Presented by')
+                    end = desc.index(' on ', start)
+                    speaker = desc[start:end].strip()
+                except:
+                    pass
+            elif desc and 'preaches' in desc.lower():
+                # Handle format like "Chris Cross preaches"
+                try:
+                    speaker = desc.split('preaches')[0].strip()
+                except:
+                    pass
+            
+            speaker_map[video['title']] = speaker
+    
     data = []
     for result in results:
         match_type = result.get('match_type', 'transcript')
+        speaker = speaker_map.get(result['title'], 'Unknown')
         
         if match_type == 'title':
             data.append({
                 'Type': 'Title',
+                'Speaker': speaker,
                 'Video Title': result['title'],
                 'Timestamp': '00:00:00',
                 'Match': result['match'],
@@ -275,6 +305,7 @@ def results_to_dataframe(results, result_type='all'):
         else:
             data.append({
                 'Type': 'Transcript',
+                'Speaker': speaker,
                 'Video Title': result['title'],
                 'Timestamp': result['timestamp'],
                 'Match': result['match'][:150] + '...' if len(result['match']) > 150 else result['match'],
@@ -282,6 +313,7 @@ def results_to_dataframe(results, result_type='all'):
             })
     
     return pd.DataFrame(data)
+
 
 def main():
     # Compact header
@@ -474,6 +506,7 @@ def main():
                             column_config={
                                 "URL": st.column_config.LinkColumn("Watch Video"),
                                 "Type": st.column_config.TextColumn("Type", width="small"),
+                                "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                                 "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                                 "Timestamp": st.column_config.TextColumn("Time", width="small"),
                                 "Match": st.column_config.TextColumn("Match", width="large")
@@ -491,6 +524,7 @@ def main():
                             column_config={
                                 "URL": st.column_config.LinkColumn("Watch Video"),
                                 "Type": st.column_config.TextColumn("Type", width="small"),
+                                "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                                 "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                                 "Timestamp": st.column_config.TextColumn("Time", width="small"),
                                 "Match": st.column_config.TextColumn("Match", width="large")
@@ -510,6 +544,7 @@ def main():
                             column_config={
                                 "URL": st.column_config.LinkColumn("Watch Video"),
                                 "Type": st.column_config.TextColumn("Type", width="small"),
+                                "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                                 "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                                 "Timestamp": st.column_config.TextColumn("Time", width="small"),
                                 "Match": st.column_config.TextColumn("Match", width="large")
@@ -529,6 +564,7 @@ def main():
                         column_config={
                             "URL": st.column_config.LinkColumn("Watch Video"),
                             "Type": st.column_config.TextColumn("Type", width="small"),
+                            "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                             "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                             "Timestamp": st.column_config.TextColumn("Time", width="small"),
                             "Match": st.column_config.TextColumn("Match", width="large")
