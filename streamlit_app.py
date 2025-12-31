@@ -1143,34 +1143,33 @@ def main():
         st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
 
     
-    # TAB 4: SPEAKER STATS
+        # TAB 4: SPEAKER STATS
     with tab4:
         st.header("Speaker Statistics")
         
-        # Load video data from database instead of JSON file
-        conn_videos = sqlite3.connect(DATABASE_PATH)
-        c_videos = conn_videos.cursor()
+        # Load video data from JSON file (has descriptions for speaker extraction)
+        video_data_path = TRANSCRIPT_DIR / 'video_data.json'
+        if not video_data_path.exists():
+            st.error("Video data not found")
+            return
         
-        c_videos.execute('SELECT video_id, title, duration, url, date_published FROM videos')
-        video_rows = c_videos.fetchall()
+        with open(video_data_path, 'r', encoding='utf-8') as f:
+            all_videos = json.load(f)
         
-        # Convert to same format as JSON
-        all_videos = []
-        for video_id, title, duration, url, date_published in video_rows:
-            all_videos.append({
-                'id': video_id,
-                'title': title,
-                'duration': duration,
-                'url': url,
-                'date': date_published,
-                'description': ''  # We'll get this from another source if needed
-            })
-        
-        conn_videos.close()
+        # Get list of videos in database (have transcripts)
+        conn_check = sqlite3.connect(DATABASE_PATH)
+        c_check = conn_check.cursor()
+        c_check.execute('SELECT DISTINCT video_id FROM transcript_segments')
+        videos_in_db = set(row[0] for row in c_check.fetchall())
+        conn_check.close()
         
         # Build speaker data
         speaker_videos = defaultdict(list)
         for video in all_videos:
+            # Only include videos with transcripts (in database)
+            if video['id'] not in videos_in_db:
+                continue
+            
             desc = video.get('description', '')
             speaker = "Unknown"
             
@@ -1193,10 +1192,7 @@ def main():
                 except:
                     pass
             
-            # Only include videos with transcripts
-            vtt_file = TRANSCRIPT_DIR / f"{video['id']}_en-x-autogen.vtt"
-            if vtt_file.exists():
-                speaker_videos[speaker].append(video)
+            speaker_videos[speaker].append(video)
         
         # Remove "Unknown" if no videos
         if not speaker_videos.get("Unknown"):
@@ -1204,11 +1200,17 @@ def main():
         
         # Speaker selector
         speakers = sorted([s for s in speaker_videos.keys() if s != "Unknown"])
+        
+        if not speakers:
+            st.info("No speakers found. Make sure video descriptions are available.")
+            return
+        
         selected_speaker = st.selectbox(
             "Select a speaker:",
             speakers,
             key="speaker_stats_select"
         )
+
         
         if selected_speaker:
             videos = speaker_videos[selected_speaker]
