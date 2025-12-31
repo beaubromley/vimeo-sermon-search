@@ -8,6 +8,7 @@ test_vimeo.py
 push_database.bat
 requirements_local.txt
 local_scripts/
+backup_data/
 how to use.txt
 
 # Python cache - don't upload these
@@ -24,7 +25,7 @@ Thumbs.db
 
 # VTT transcript files (too large, only need database)
 data/transcripts/*.vtt
-data/transcripts/video_data.json
+# data/transcripts/video_data.json
 
 # Temporary files
 data/temp/
