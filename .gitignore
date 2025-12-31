@@ -25,7 +25,6 @@ Thumbs.db
 
 # VTT transcript files (too large, only need database)
 data/transcripts/*.vtt
-# data/transcripts/video_data.json
 
 # Temporary files
 data/temp/
