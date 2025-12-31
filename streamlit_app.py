@@ -1131,14 +1131,26 @@ def main():
     with tab4:
         st.header("Speaker Statistics")
         
-        # Load video data and extract speakers
-        video_data_path = TRANSCRIPT_DIR / 'video_data.json'
-        if not video_data_path.exists():
-            st.error("Video data not found")
-            return
+        # Load video data from database instead of JSON file
+        conn_videos = sqlite3.connect(DATABASE_PATH)
+        c_videos = conn_videos.cursor()
         
-        with open(video_data_path, 'r', encoding='utf-8') as f:
-            all_videos = json.load(f)
+        c_videos.execute('SELECT video_id, title, duration, url, date_published FROM videos')
+        video_rows = c_videos.fetchall()
+        
+        # Convert to same format as JSON
+        all_videos = []
+        for video_id, title, duration, url, date_published in video_rows:
+            all_videos.append({
+                'id': video_id,
+                'title': title,
+                'duration': duration,
+                'url': url,
+                'date': date_published,
+                'description': ''  # We'll get this from another source if needed
+            })
+        
+        conn_videos.close()
         
         # Build speaker data
         speaker_videos = defaultdict(list)
