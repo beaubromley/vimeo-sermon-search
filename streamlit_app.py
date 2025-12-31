@@ -268,29 +268,28 @@ def results_to_dataframe(results, result_type='all'):
     if not results:
         return None
     
-    # Load video data to get descriptions/speakers
+    # Load video data to get descriptions/speakers and dates
     video_data_path = TRANSCRIPT_DIR / 'video_data.json'
     speaker_map = {}
+    date_map = {}
+    
     if video_data_path.exists():
         with open(video_data_path, 'r', encoding='utf-8') as f:
             videos = json.load(f)
         
-        # Extract speaker names from descriptions
+        # Extract speaker names and dates from descriptions
         for video in videos:
             speaker = "Unknown"
             desc = video.get('description', '')
             
             if desc and 'Speaker:' in desc:
-                # Handle format like "Speaker: Dennis Newkirk"
                 try:
                     start = desc.index('Speaker:') + len('Speaker:')
-                    # Get text after "Speaker:" until newline or end
                     rest = desc[start:].strip()
                     speaker = rest.split('\n')[0].strip()
                 except:
                     pass
             elif desc and 'Presented by' in desc:
-                # Extract name between "Presented by" and "on"
                 try:
                     start = desc.index('Presented by') + len('Presented by')
                     end = desc.index(' on ', start)
@@ -298,22 +297,30 @@ def results_to_dataframe(results, result_type='all'):
                 except:
                     pass
             elif desc and 'preaches' in desc.lower():
-                # Handle format like "Chris Cross preaches"
                 try:
                     speaker = desc.split('preaches')[0].strip()
                 except:
                     pass
             
             speaker_map[video['title']] = speaker
+            
+            # Get date
+            try:
+                video_date = datetime.fromisoformat(video['date'].replace('Z', '+00:00'))
+                date_map[video['title']] = video_date.strftime('%Y-%m-%d')
+            except:
+                date_map[video['title']] = video.get('date', '')[:10]
     
     data = []
     for result in results:
         match_type = result.get('match_type', 'transcript')
         speaker = speaker_map.get(result['title'], 'Unknown')
+        date = date_map.get(result['title'], '')
         
         if match_type == 'title':
             data.append({
                 'Type': 'Title',
+                'Date': date,
                 'Speaker': speaker,
                 'Video Title': result['title'],
                 'Timestamp': '00:00:00',
@@ -323,6 +330,7 @@ def results_to_dataframe(results, result_type='all'):
         else:
             data.append({
                 'Type': 'Transcript',
+                'Date': date,
                 'Speaker': speaker,
                 'Video Title': result['title'],
                 'Timestamp': result['timestamp'],
@@ -455,6 +463,7 @@ def main():
                                 column_config={
                                     "URL": st.column_config.LinkColumn("Watch Video"),
                                     "Type": st.column_config.TextColumn("Type", width="small"),
+                                    "Date": st.column_config.TextColumn("Date", width="small"),
                                     "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                                     "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                                     "Timestamp": st.column_config.TextColumn("Time", width="small"),
@@ -473,6 +482,7 @@ def main():
                                 column_config={
                                     "URL": st.column_config.LinkColumn("Watch Video"),
                                     "Type": st.column_config.TextColumn("Type", width="small"),
+                                    "Date": st.column_config.TextColumn("Date", width="small"),
                                     "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                                     "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                                     "Timestamp": st.column_config.TextColumn("Time", width="small"),
@@ -493,6 +503,7 @@ def main():
                                 column_config={
                                     "URL": st.column_config.LinkColumn("Watch Video"),
                                     "Type": st.column_config.TextColumn("Type", width="small"),
+                                    "Date": st.column_config.TextColumn("Date", width="small"),
                                     "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                                     "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                                     "Timestamp": st.column_config.TextColumn("Time", width="small"),
@@ -513,6 +524,7 @@ def main():
                             column_config={
                                 "URL": st.column_config.LinkColumn("Watch Video"),
                                 "Type": st.column_config.TextColumn("Type", width="small"),
+                                "Date": st.column_config.TextColumn("Date", width="small"),
                                 "Speaker": st.column_config.TextColumn("Speaker", width="small"),
                                 "Video Title": st.column_config.TextColumn("Video Title", width="medium"),
                                 "Timestamp": st.column_config.TextColumn("Time", width="small"),
