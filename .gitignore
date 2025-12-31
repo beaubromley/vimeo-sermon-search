@@ -6,6 +6,9 @@ scripts/
 update_and_run.py
 test_vimeo.py
 push_database.bat
+requirements_local.txt
+local_scripts/
+how to use.txt
 
 # Python cache - don't upload these
 __pycache__/
@@ -13,10 +16,20 @@ __pycache__/
 *.pyo
 **/*.pyc
 **/__pycache__/
+venv/
 
 # OS files
 .DS_Store
+Thumbs.db
 
 # VTT transcript files (too large, only need database)
 data/transcripts/*.vtt
 data/transcripts/video_data.json
+
+# Temporary files
+data/temp/
+
+# Test files
+test_*.py
+explore_*.py
+find_*.py

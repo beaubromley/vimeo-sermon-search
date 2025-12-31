@@ -108,7 +108,10 @@ class TranscriptManager:
             for caption in webvtt.read(vtt_file):
                 start_time = self._timestamp_to_seconds(caption.start)
                 end_time = self._timestamp_to_seconds(caption.end)
-                vimeo_url = f"{video_data['url']}#t={int(start_time)}"
+                
+                # Use player.vimeo.com to avoid spam check
+                video_id = video_data['url'].split('/')[-1]
+                vimeo_url = f"https://player.vimeo.com/video/{video_id}#t={int(start_time)}s"
                 
                 # Add to main table
                 c.execute('''

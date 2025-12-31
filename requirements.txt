@@ -1,5 +1,4 @@
 streamlit==1.29.0
 pandas
 webvtt-py==0.4.6
-
-# Force rebuild
+plotly
