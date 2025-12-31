@@ -622,11 +622,15 @@ def main():
         # Build filtered video list
         filtered_videos = []
         
+        # Get list of videos that are in the database (have transcripts)
+        c.execute('SELECT DISTINCT video_id FROM transcript_segments')
+        videos_in_db = set(row[0] for row in c.fetchall())
+        
         for video in all_videos:
-            # Check if video has transcript
-            vtt_file = TRANSCRIPT_DIR / f"{video['id']}_en-x-autogen.vtt"
-            if not vtt_file.exists():
+            # Check if video is in database (has transcript)
+            if video['id'] not in videos_in_db:
                 continue  # Skip videos without transcripts
+
             
             # Apply speaker filter
             if speaker_filter != "All":
