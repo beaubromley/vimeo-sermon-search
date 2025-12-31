@@ -339,7 +339,7 @@ def main():
     if logo_path.exists():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.image(str(logo_path), use_container_width=True)
+            st.image(str(logo_path), use_column_width=True)
 
     else:
         # Fallback to text header if image not found
@@ -1083,9 +1083,18 @@ def main():
                         
                         chapters[chapter].append((verse_ref, count))
                     
-                    # Display by chapter
-                    for chapter in sorted(chapters.keys()):
-                        with st.expander(f"Chapter {chapter} ({sum(c for _, c in chapters[chapter])} references)"):
+                    # Display by chapter (handle None for standalone mentions)
+                    sorted_chapters = sorted([c for c in chapters.keys() if c is not None])
+                    if None in chapters:
+                        sorted_chapters.append(None)
+                    
+                    for chapter in sorted_chapters:
+                        if chapter is None:
+                            chapter_label = "General mentions (no specific chapter)"
+                        else:
+                            chapter_label = f"Chapter {chapter}"
+                        
+                        with st.expander(f"{chapter_label} ({sum(c for _, c in chapters[chapter])} references)"):
                             for verse_ref, count in chapters[chapter]:
                                 st.write(f"  Verse {verse_ref}: {count} mentions")
                             

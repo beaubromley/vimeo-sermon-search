@@ -49,8 +49,48 @@ class TranscriptManager:
             USING fts5(video_id, start_time, end_time, text, vimeo_url)
         ''')
         
+        # Create Bible references table
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS bible_references (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                video_id TEXT,
+                book TEXT,
+                chapter INTEGER,
+                verse_start INTEGER,
+                verse_end INTEGER,
+                start_time REAL,
+                end_time REAL,
+                context TEXT,
+                FOREIGN KEY (video_id) REFERENCES videos (video_id)
+            )
+        ''')
+        
+        # Create indexes for Bible references
+        c.execute('CREATE INDEX IF NOT EXISTS idx_bible_book ON bible_references(book)')
+        c.execute('CREATE INDEX IF NOT EXISTS idx_bible_chapter ON bible_references(book, chapter)')
+        c.execute('CREATE INDEX IF NOT EXISTS idx_bible_video ON bible_references(video_id)')
+        
+        # Create theological topics table
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS theological_topics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                video_id TEXT,
+                topic TEXT,
+                keyword_matched TEXT,
+                start_time REAL,
+                end_time REAL,
+                context TEXT,
+                FOREIGN KEY (video_id) REFERENCES videos (video_id)
+            )
+        ''')
+        
+        # Create indexes for topics
+        c.execute('CREATE INDEX IF NOT EXISTS idx_topic ON theological_topics(topic)')
+        c.execute('CREATE INDEX IF NOT EXISTS idx_topic_video ON theological_topics(video_id)')
+        
         conn.commit()
         conn.close()
+
 
     def _timestamp_to_seconds(self, timestamp):
         """Convert VTT timestamp to seconds"""
